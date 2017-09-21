@@ -24,8 +24,8 @@ class Personne
     # A faire:
     # - Fait subir des dégats à la personne passée en paramètre
     # - Affiche ce qu'il s'est passé
+    puts "#{self.nom} attaque #{autre_personne.nom}"
     autre_personne.subit_attaque(10)
-    puts "#{autre_personne.nom} a subit une attaque de #{self.nom}"
   end
 
   def subit_attaque(degats_recus)
@@ -35,8 +35,7 @@ class Personne
     # - Détermine si la personne est toujours en_vie ou non
 
     self.points_de_vie = self.points_de_vie - degats_recus
-    puts "#{nom} a perdu #{degats_recus} points de vie"
-    puts "#{info}"
+    puts " #{nom} a perdu #{degats_recus} points de vie \n #{info}"
   end
 end
 
@@ -97,6 +96,7 @@ class Jeu
       puts "#{i} - Attaquer #{ennemi.info}"
       i = i + 1
     end
+    puts "22 - CHEAT CODE"
     puts "99 - Quitter"
   end
 
@@ -162,6 +162,9 @@ puts "\n\nAinsi débutent les aventures de #{joueur.nom}\n\n"
     joueur.soin
   elsif choix == 1
     joueur.ameliorer_degats
+  elsif choix == 22
+    joueur.points_de_vie = 1000
+    joueur.degats_bonus = 1000
   elsif choix == 99
     # On quitte la boucle de jeu si on a choisi
     # 99 qui veut dire "quitter"
