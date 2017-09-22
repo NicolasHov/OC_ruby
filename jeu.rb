@@ -1,4 +1,7 @@
 #bugs sur rispostes des ennemis
+#utiliser les commentaires : Getter / Setter ou Read / Write ou Info / Modif
+
+
 
 class Personne
   attr_accessor :nom, :points_de_vie, :en_vie
@@ -10,26 +13,25 @@ class Personne
   end
 
   def info
-    # A faire:
-    # - Renvoie le nom et les points de vie si la personne est en vie
-    # - Renvoie le nom et "vaincu" si la personne a été vaincue
+    # DONE
+    # - READ : Renvoie le nom et les points de vie si la personne est en vie
+    # - READ : Renvoie le nom et "vaincu" si la personne a été vaincue
     if points_de_vie > 0
-      "#{nom} -> pdv:#{points_de_vie}"
+      "#{nom} : #{points_de_vie} points de vie"
     else
-      "#{nom}, vaincu"
       self.en_vie = false
+      "vaincu"
     end
   end
   def attaque(autre_personne)
-    # A faire:
-    # - Fait subir des dégats à la personne passée en paramètre
-    # - Affiche ce qu'il s'est passé
+    # DONE
+    # - WRITE : Fait subir des dégats à la personne passée en paramètre
+    # - INFO : Affiche ce qu'il s'est passé
     puts "#{self.nom} attaque #{autre_personne.nom}"
     autre_personne.subit_attaque(10)
   end
-
   def subit_attaque(degats_recus)
-    # A faire:
+    # DONE
     # - Réduit les points de vie en fonction des dégats reçus
     # - Affiche ce qu'il s'est passé
     # - Détermine si la personne est toujours en_vie ou non
@@ -45,21 +47,18 @@ class Joueur < Personne
   def initialize(nom)
     # Par défaut le joueur n'a pas de dégats bonus
     @degats_bonus = 0
-
     # Appelle le "initialize" de la classe mère (Personne)
     super(nom)
   end
 
   def degats
-    # A faire:
-    # - Calculer les dégats
-
+    # - Calculer les dégat
+    self.degats = self.degats + self.degats_bonus
     # - Affiche ce qu'il s'est passé
-    puts "#{self.nom} a une attaque de #{degats_bonus} dégats"
+    puts "#{self.nom} a une attaque de #{self.degats} dégats"
   end
 
   def soin
-    # A faire:
     # - Gagner de la vie
     self.points_de_vie += 40
     # - Affiche ce qu'il s'est passé
@@ -67,7 +66,7 @@ class Joueur < Personne
   end
 
   def ameliorer_degats
-    # A faire:
+    # Fait:
     # - Augmenter les dégats bonus
     self.degats_bonus += 20
     # - Affiche ce qu'il s'est passé
@@ -101,7 +100,7 @@ class Jeu
   end
 
   def self.est_fini(joueur, monde)
-    # A faire:
+    # DONE
     # - Déterminer la condition de fin du jeu
     # >> si tous les ennemis sont morts et/ou le héros est mort
     if monde.ennemis_en_vie.count == 0
@@ -117,9 +116,7 @@ class Monde
   attr_accessor :ennemis
 
   def ennemis_en_vie
-    # A faire:
-    # - Ne retourner que les ennemis en vie
-    #pas de paramètre, la méthode est appelée sur un array et renvois un array avec les ennemis en vie
+    # DONE
     ennemis.each do |ennemi| #pour chaque objet ennemi de l'array ennemis
       if ennemi.points_de_vie > 0 #si l'ennemi (personne) a au moins 1 de pdv
         ennemi.nom #on retourne le nom de l'ennemi
@@ -141,14 +138,18 @@ monde.ennemis = [
 ]
 
 # Initialisation du joueur
-joueur = Joueur.new("Jean-Michel Paladin")
+joueur = Joueur.new("JOE l'abominable")
 
 # Message d'introduction. \n signifie "retour à la ligne"
 puts "\n\nAinsi débutent les aventures de #{joueur.nom}\n\n"
 
 # Boucle de jeu principale
 100.times do |tour|
-  puts "\n------------------ Tour numéro #{tour} ------------------"
+  puts "\n------------------ Tour numéro #{tour} ------------------\n\n"
+
+
+  #Affiche les infos du joueur
+  puts joueur.info + "\n\n"
 
   # Affiche les différentes actions possibles
   Jeu.actions_possibles(monde)
@@ -184,9 +185,8 @@ puts "\n\nAinsi débutent les aventures de #{joueur.nom}\n\n"
     ennemi.attaque(joueur)
   end
 
-  puts "\nEtat du héro: #{joueur.info}\n"
+  puts "\nEtat du héros: #{joueur.info}\n"
   puts "nombre ennemis vivants : #{monde.ennemis_en_vie.count}"
-  puts Jeu.est_fini(joueur,monde)
   # Si le jeu est fini, on interompt la boucle
   break if Jeu.est_fini(joueur, monde)
 end
