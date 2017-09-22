@@ -1,3 +1,4 @@
+# taper 22 pour cheat code
 #bugs sur rispostes des ennemis
 #utiliser les commentaires : Getter / Setter ou Read / Write ou Info / Modif
 
@@ -17,27 +18,29 @@ class Personne
     # - READ : Renvoie le nom et les points de vie si la personne est en vie
     # - READ : Renvoie le nom et "vaincu" si la personne a été vaincue
     if points_de_vie > 0
-      "#{nom} : #{points_de_vie} points de vie"
+      "#{nom} (#{points_de_vie}/100pdv)"
     else
       self.en_vie = false
       "vaincu"
     end
   end
-  def attaque(autre_personne)
+  def attaque(personne)
     # DONE
     # - WRITE : Fait subir des dégats à la personne passée en paramètre
     # - INFO : Affiche ce qu'il s'est passé
-    puts "#{self.nom} attaque #{autre_personne.nom}"
-    autre_personne.subit_attaque(10)
+    puts "#{self.nom} attaque #{personne.nom}"
+    personne.subit_attaque(10)
   end
   def subit_attaque(degats_recus)
     # DONE
     # - Réduit les points de vie en fonction des dégats reçus
+    self.points_de_vie = self.points_de_vie - degats_recus  ## erreur icic a priori
     # - Affiche ce qu'il s'est passé
-    # - Détermine si la personne est toujours en_vie ou non
-
-    self.points_de_vie = self.points_de_vie - degats_recus
     puts " #{nom} a perdu #{degats_recus} points de vie \n #{info}"
+    # - Détermine si la personne est toujours en_vie ou nons
+    if self.en_vie == false
+      puts " #{nom} est mort"
+    end
   end
 end
 
@@ -52,10 +55,11 @@ class Joueur < Personne
   end
 
   def degats
-    # - Calculer les dégat
-    self.degats = self.degats + self.degats_bonus
+    # - Calculer les dégats ====>>>>> faire en sorte que
+    #les attaques pernnent en compte les dégats bonus
+
     # - Affiche ce qu'il s'est passé
-    puts "#{self.nom} a une attaque de #{self.degats} dégats"
+    puts "#{self.nom} a une attaque de #{degats_bonus} dégats"
   end
 
   def soin
@@ -71,6 +75,7 @@ class Joueur < Personne
     self.degats_bonus += 20
     # - Affiche ce qu'il s'est passé
     puts "#{self.nom} a gagné 20 points de degats !"
+    self.degats
   end
 end
 
@@ -78,6 +83,8 @@ class Ennemi < Personne
   def degats
     # A faire:
     # - Calculer les dégats
+    degats = 5
+    puts "#{nom} a une attauqe de #{degats} degats"
   end
 end
 
@@ -92,10 +99,11 @@ class Jeu
     # de soin et d'amélioration d'attaque
     i = 2
     monde.ennemis.each do |ennemi|
-      puts "#{i} - Attaquer #{ennemi.info}"
-      i = i + 1
+      if ennemi.en_vie == true
+        puts "#{i} - Attaquer #{ennemi.info}"
+        i = i + 1
+      end
     end
-    puts "22 - CHEAT CODE"
     puts "99 - Quitter"
   end
 
@@ -163,7 +171,7 @@ puts "\n\nAinsi débutent les aventures de #{joueur.nom}\n\n"
     joueur.soin
   elsif choix == 1
     joueur.ameliorer_degats
-  elsif choix == 22
+  elsif choix == 22 #CHEAT CODE pour les tests
     joueur.points_de_vie = 1000
     joueur.degats_bonus = 1000
   elsif choix == 99
@@ -175,6 +183,7 @@ puts "\n\nAinsi débutent les aventures de #{joueur.nom}\n\n"
     # car les choix 0 et 1 étaient réservés pour le soin et
     # l'amélioration d'attaque
     ennemi_a_attaquer = monde.ennemis[choix - 2]
+    puts "la vie c'est de l'eau"
     joueur.attaque(ennemi_a_attaquer)
   end
 
