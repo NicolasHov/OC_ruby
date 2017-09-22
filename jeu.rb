@@ -1,44 +1,42 @@
-# taper 22 pour cheat code
-#bugs sur rispostes des ennemis
-#utiliser les commentaires : Getter / Setter ou Read / Write ou Info / Modif
-
-
-
 class Personne
   attr_accessor :nom, :points_de_vie, :en_vie
 
   def initialize(nom)
     @nom = nom
-    @points_de_vie = 100
+    @points_de_vie = 300
     @en_vie = true
   end
 
+  # READ
   def info
-    # DONE
-    # - READ : Renvoie le nom et les points de vie si la personne est en vie
-    # - READ : Renvoie le nom et "vaincu" si la personne a été vaincue
+    # - Renvoie le nom et les points de vie si la personne est en vie
+    # - Renvoie le nom et "vaincu" si la personne a été vaincue
     if points_de_vie > 0
-      "#{nom} (#{points_de_vie}/100pdv)"
+      "#{self.nom} (#{self.points_de_vie}/100pdv)"
     else
-      self.en_vie = false
-      "vaincu"
+      "#{self.nom} vaincu"
     end
   end
+
+  # READ
   def attaque(personne)
-    # DONE
-    # - WRITE : Fait subir des dégats à la personne passée en paramètre
-    # - INFO : Affiche ce qu'il s'est passé
-    puts "#{self.nom} attaque #{personne.nom}"
-    personne.subit_attaque(10)
-  end
-  def subit_attaque(degats_recus)
-    # DONE
-    # - Réduit les points de vie en fonction des dégats reçus
-    self.points_de_vie = self.points_de_vie - degats_recus  ## erreur icic a priori
+    # - Fait subir des dégats à la personne passée en paramètre
     # - Affiche ce qu'il s'est passé
-    puts " #{nom} a perdu #{degats_recus} points de vie \n #{info}"
+    puts "#{self.nom} attaque #{personne.nom}"
+    personne.subit_attaque(self.degats)
+  end
+
+  # WRITE
+  def subit_attaque(degats_recus)
+    # - Réduit les points de vie en fonction des dégats reçus
+    self.points_de_vie = self.points_de_vie - degats_recus
+    # - Affiche ce qu'il s'est passé
+    puts "#{self.nom} a perdu #{degats_recus} points de vie"
+    puts "#{self.info}"
     # - Détermine si la personne est toujours en_vie ou nons
-    if self.en_vie == false
+    if self.points_de_vie <= 0
+      self.en_vie = false
+      self.points_de_vie = 0
       puts " #{nom} est mort"
     end
   end
@@ -54,14 +52,16 @@ class Joueur < Personne
     super(nom)
   end
 
+  # READ
   def degats
-    # - Calculer les dégats ====>>>>> faire en sorte que
-    #les attaques pernnent en compte les dégats bonus
-
+    # - Calculer les dégats
+    puissance_degats = 5 + degats_bonus
     # - Affiche ce qu'il s'est passé
-    puts "#{self.nom} a une attaque de #{degats_bonus} dégats"
+    puts "#{self.nom} a une attaque de #{puissance_degats} dégats"
+    return puissance_degats
   end
 
+  # WRITE
   def soin
     # - Gagner de la vie
     self.points_de_vie += 40
@@ -69,22 +69,23 @@ class Joueur < Personne
     puts "#{self.nom} a gagné 40 pdv !"
   end
 
+  # WRITE
   def ameliorer_degats
-    # Fait:
     # - Augmenter les dégats bonus
     self.degats_bonus += 20
     # - Affiche ce qu'il s'est passé
     puts "#{self.nom} a gagné 20 points de degats !"
-    self.degats
   end
 end
 
 class Ennemi < Personne
+  # READ
   def degats
-    # A faire:
     # - Calculer les dégats
-    degats = 5
-    puts "#{nom} a une attauqe de #{degats} degats"
+    puissance_degats = 5
+    # - Affiche ce qu'il s'est passé
+    puts "#{nom} a une attaque de #{puissance_degats} degats"
+    return puissance_degats
   end
 end
 
@@ -99,24 +100,18 @@ class Jeu
     # de soin et d'amélioration d'attaque
     i = 2
     monde.ennemis.each do |ennemi|
-      if ennemi.en_vie == true
+      # if ennemi.en_vie == true
         puts "#{i} - Attaquer #{ennemi.info}"
         i = i + 1
-      end
+      # end
     end
     puts "99 - Quitter"
   end
 
   def self.est_fini(joueur, monde)
-    # DONE
     # - Déterminer la condition de fin du jeu
     # >> si tous les ennemis sont morts et/ou le héros est mort
-    if monde.ennemis_en_vie.count == 0
-      "true"
-    end
-    if joueur.points_de_vie <= 0
-      "true"
-    end
+    !joueur.en_vie || monde.ennemis_en_vie.count <= 0
   end
 end
 
@@ -124,10 +119,9 @@ class Monde
   attr_accessor :ennemis
 
   def ennemis_en_vie
-    # DONE
-    ennemis.each do |ennemi| #pour chaque objet ennemi de l'array ennemis
-      if ennemi.points_de_vie > 0 #si l'ennemi (personne) a au moins 1 de pdv
-        ennemi.nom #on retourne le nom de l'ennemi
+    ennemis.each do |ennemi| # pour chaque objet ennemi de l'array ennemis
+      if ennemi.points_de_vie >= 0 # si l'ennemi (personne) a au moins 1 de pdv
+        ennemi # on retourne le nom de l'ennemi
       end
     end
   end
@@ -171,20 +165,18 @@ puts "\n\nAinsi débutent les aventures de #{joueur.nom}\n\n"
     joueur.soin
   elsif choix == 1
     joueur.ameliorer_degats
-  elsif choix == 22 #CHEAT CODE pour les tests
-    joueur.points_de_vie = 1000
-    joueur.degats_bonus = 1000
   elsif choix == 99
     # On quitte la boucle de jeu si on a choisi
     # 99 qui veut dire "quitter"
     break
-  else
+  elsif choix - 2 >= monde.ennemis.count
     # Choix - 2 car nous avons commencé à compter à partir de 2
     # car les choix 0 et 1 étaient réservés pour le soin et
     # l'amélioration d'attaque
     ennemi_a_attaquer = monde.ennemis[choix - 2]
-    puts "la vie c'est de l'eau"
     joueur.attaque(ennemi_a_attaquer)
+  else
+    puts "choix impossible boloss"
   end
 
   puts "\nLES ENNEMIS RIPOSTENT !"
@@ -200,11 +192,7 @@ puts "\n\nAinsi débutent les aventures de #{joueur.nom}\n\n"
   break if Jeu.est_fini(joueur, monde)
 end
 
-puts "\nGame Over!\n"
-
-# A faire:
 # - Afficher le résultat de la partie
-
 if joueur.en_vie
   puts "Vous avez gagné !"
 else
