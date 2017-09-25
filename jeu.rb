@@ -1,3 +1,9 @@
+# Remarques sur le code / l'exercice :
+# 1.Les méthodes degats et soin sont redondantes pour les classes qui héritent de Personne
+# => on pourrait les refactoriser dans Personne puis les override
+# 2. Les noms des méthodes sont d'ailleurs mal choisis et devraient être remplacés par des verbes (idéalement en anglais)
+# 3. De manière générale, éviter les \n dans le code, c'est assez moche et moins lisible qu'un retour à la ligne avec un puts
+
 class Personne
   attr_accessor :nom, :points_de_vie, :en_vie
 
@@ -10,9 +16,9 @@ class Personne
   # READ
   def info
     # - Renvoie le nom et les points de vie si la personne est en vie
-    # - Renvoie le nom et "vaincu" si la personne a été vaincue
+    # - Renvoie le nom et "vaincu" si la personne a été vaincu-
     if points_de_vie > 0
-      "#{self.nom} (#{self.points_de_vie}/100pdv)"
+      "#{self.nom} (#{self.points_de_vie}/300pdv)"
     else
       "#{self.nom} vaincu"
     end
@@ -22,7 +28,7 @@ class Personne
   def attaque(personne)
     # - Fait subir des dégats à la personne passée en paramètre
     # - Affiche ce qu'il s'est passé
-    puts "#{self.nom} attaque #{personne.nom}"
+    puts "#{nom} attaque #{personne.nom}" # TODO pourquoi attaque meme si plus ennemeis vivants ??
     personne.subit_attaque(self.degats)
   end
 
@@ -32,13 +38,12 @@ class Personne
     self.points_de_vie = self.points_de_vie - degats_recus
     # - Affiche ce qu'il s'est passé
     puts "#{self.nom} a perdu #{degats_recus} points de vie"
-    puts "#{self.info}"
-    # - Détermine si la personne est toujours en_vie ou nons
+    # - Détermine si la personne est toujours en_vie ou non
     if self.points_de_vie <= 0
       self.en_vie = false
-      self.points_de_vie = 0
-      puts " #{nom} est mort"
+      #self.points_de_vie = 0 #  sécurité pour éviter d'avoir des pdv négatifs
     end
+    puts "#{self.info}"
   end
 end
 
@@ -118,10 +123,11 @@ end
 class Monde
   attr_accessor :ennemis
 
-  def ennemis_en_vie
-    ennemis.each do |ennemi| # pour chaque objet ennemi de l'array ennemis
-      if ennemi.points_de_vie >= 0 # si l'ennemi (personne) a au moins 1 de pdv
-        ennemi # on retourne le nom de l'ennemi
+  def ennemis_en_vie # TODO pb de MAJ => le jeu ne fini jamais
+    self.ennemis.each do |ennemi| # pour chaque objet ennemi de l'array ennemis
+      if ennemi.en_vie == true # si l'ennemi (personne) a au moins 1 de pdv
+        puts ennemi.nom + " : #{ennemi.points_de_vie} pdv"
+        ennemi # on retourne le nom de l'ennemi (ruby permet de renvoyer directement un tableau filtré !!)
       end
     end
   end
@@ -136,7 +142,8 @@ monde = Monde.new
 monde.ennemis = [
   Ennemi.new("Balrog"),
   Ennemi.new("Goblin"),
-  Ennemi.new("Squelette")
+  Ennemi.new("Squelette"),
+  Ennemi.new("Macron")
 ]
 
 # Initialisation du joueur
@@ -151,14 +158,15 @@ puts "\n\nAinsi débutent les aventures de #{joueur.nom}\n\n"
 
 
   #Affiche les infos du joueur
-  puts joueur.info + "\n\n"
+  puts joueur.info
+  puts "\n\n"
 
   # Affiche les différentes actions possibles
   Jeu.actions_possibles(monde)
 
   puts "\nQUELLE ACTION FAIRE ?"
   # On range dans la variable "choix" ce que l'utilisateur renseigne
-  choix = gets.chomp.to_i
+  choix = gets.to_i # utiliser chomp et to_i ensemble est redondant il me semble http://ruby-doc.org/docs/ruby-doc-bundle/Tutorial/part_02/user_input.html
 
   # En fonction du choix on appelle différentes méthodes sur le joueur
   if choix == 0
@@ -169,25 +177,25 @@ puts "\n\nAinsi débutent les aventures de #{joueur.nom}\n\n"
     # On quitte la boucle de jeu si on a choisi
     # 99 qui veut dire "quitter"
     break
-  elsif choix - 2 >= monde.ennemis.count
+  elsif choix >= monde.ennemis.count - 2 && choix < 99
     # Choix - 2 car nous avons commencé à compter à partir de 2
     # car les choix 0 et 1 étaient réservés pour le soin et
     # l'amélioration d'attaque
-    ennemi_a_attaquer = monde.ennemis[choix - 2]
+    ennemi_a_attaquer = monde.ennemis_en_vie[choix - 2]
     joueur.attaque(ennemi_a_attaquer)
-  else
-    puts "choix impossible boloss"
+  elsif
+    puts "CHOIX IMPOSSIBLE : recommence gamin !"
   end
 
   puts "\nLES ENNEMIS RIPOSTENT !"
   # Pour tous les ennemis en vie ...
   monde.ennemis_en_vie.each do |ennemi|
+    puts ennemi.nom
     # ... le héro subit une attaque.
     ennemi.attaque(joueur)
   end
 
   puts "\nEtat du héros: #{joueur.info}\n"
-  puts "nombre ennemis vivants : #{monde.ennemis_en_vie.count}"
   # Si le jeu est fini, on interompt la boucle
   break if Jeu.est_fini(joueur, monde)
 end
