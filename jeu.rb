@@ -123,12 +123,9 @@ end
 class Monde
   attr_accessor :ennemis
 
-  def ennemis_en_vie # TODO pb de MAJ => le jeu ne fini jamais
-    self.ennemis.each do |ennemi| # pour chaque objet ennemi de l'array ennemis
-      if ennemi.en_vie == true # si l'ennemi (personne) a au moins 1 de pdv
-        puts ennemi.nom + " : #{ennemi.points_de_vie} pdv"
-        ennemi # on retourne le nom de l'ennemi (ruby permet de renvoyer directement un tableau filtré !!)
-      end
+  def ennemis_en_vie
+    self.ennemis.select do |ennemi|
+        ennemi.en_vie
     end
   end
 end
