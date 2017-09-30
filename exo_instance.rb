@@ -2,34 +2,43 @@ class Utilisateur
   attr_accessor :nom, :amis
 
 #attention j'ai utilisé nom au lieu de prenom
-  def initialize(nom)
+  def initialize(nom, amis)
     @nom = nom
+    @amis = amis
   end
 
   #methode sans param
   def lister_amis
-    amis.each do |ami|
-      puts ami.nom
+    puts "Les amis de #{self.nom} sont "
+    self.amis.each do |ami|
+      puts ami
     end
   end
 
   #methode qui renvois true si utilisateur ami avec autre utilisateur
   def est_amis_avec?(autre_nom)
     puts "Est-ce que " + nom + " est ami avec " + autre_nom + " ? "
-    amis.each do |ami|
-      if ami.nom != autre_nom
-        puts "Non"
+    answer = nil
+    self.amis.each do |ami|
+      if ami == autre_nom
+        answer= "Oui"
       else
-        puts "Oui"
+        answer= "Non"
       end
     end
+    puts answer
   end
+
 end
-utilisateur1 = Utilisateur.new("Bob")
-utilisateur2 = Utilisateur.new("Jane")
-utilisateur0 = Utilisateur.new("Alice")
-utilisateur0.amis = [utilisateur1, utilisateur2]
+
+jane = Utilisateur.new("Jane", ["mickael", "john", "alain", "tom"])
+bob = Utilisateur.new("Bob", ["jane", "thomas", "tom", "kiki"])
+alice = Utilisateur.new("Alice", ["jane", "bob", "koko", "kuku"])
+
+
+
 #appel des méthodes
-puts "Les amis de #{utilisateur0.nom} sont "
-utilisateur0.lister_amis
-utilisateur0.est_amis_avec?("Bob")
+
+jane.est_amis_avec?("john")
+alice.est_amis_avec?("koko")
+bob.est_amis_avec?("thomas")
